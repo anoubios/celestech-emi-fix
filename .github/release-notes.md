@@ -1,5 +1,10 @@
 Unofficial, client-side fix that makes CelesTech recipes show up in EMI again and easy to read (Minecraft 1.21.1, NeoForge).
 
+**New in 1.1.1**
+- Recipe buttons (favorite, tree, fill) sit centered in their own side panel next to the enlarged recipe.
+- Fluid tanks no longer touch the top edge of the machine panel.
+- EMI no longer logs "Error rendering tooltip" (NullPointerException on JemiPlugin.runtime) while JEI reloads.
+
 **New in 1.1.0**
 - CelesTech recipes are enlarged to fill EMI's window, so their text is readable. The zoom adapts to your screen.
 - On CelesTech tabs the whole recipe window uses CelesTech's style. Other mods' tabs look as usual.

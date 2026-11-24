@@ -26,7 +26,10 @@ version of it in the folder.
   buttons, workstation slot) is drawn in CelesTech's colors. Tabs from other mods keep EMI's normal look.
 - **Machine tab first.** The block, item and fluid tag tabs move to the end, so opening recipes for a machine shows
   the machine's tab first.
-- **Tidy panels.** Machine animations that reach slightly past CelesTech's panel are kept inside it.
+- **Tidy panels.** Fluid tanks get a little space below the panel's top edge, machine animations that reach slightly
+  past the panel are kept inside it, and the recipe buttons sit centered in a side panel of their own.
+- **Quieter log.** EMI 1.1.24 logs "Error rendering tooltip" when the mouse is over a screen while JEI reloads; that
+  lookup is skipped until JEI is back.
 
 Settings are in game under Mods > CelesTech EMI Fix > Config (or `config/jeict-client.toml`): the style can be turned
 off, and the largest zoom changed (1.0 keeps EMI's normal size).

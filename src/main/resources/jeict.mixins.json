@@ -6,8 +6,11 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "EmiAgnosMixin",
+    "JemiPluginMixin",
     "JemiSlotWidgetMixin",
+    "PanelRecetaMaquinaMixin",
     "RecipeBackgroundMixin",
+    "RecipeButtonWidgetAccessor",
     "RecipeButtonWidgetMixin",
     "RecipeScreenMixin",
     "SizedButtonWidgetMixin",

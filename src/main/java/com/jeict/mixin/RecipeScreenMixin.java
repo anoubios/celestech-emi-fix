@@ -1,6 +1,10 @@
 package com.jeict.mixin;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.jeict.Config;
 import com.jeict.theme.CelesTechStyle;
@@ -10,6 +14,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarSide;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -19,6 +24,7 @@ import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.RecipeTab;
 import dev.emi.emi.screen.WidgetGroup;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
+import dev.emi.emi.widget.RecipeButtonWidget;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -47,6 +53,7 @@ public abstract class RecipeScreenMixin extends Screen implements RecipeScreenAc
     @Shadow private int page;
     @Shadow private List<SizedButtonWidget> arrows;
     @Shadow private List<WidgetGroup> currentPage;
+    @Shadow int backgroundWidth;
     @Shadow int backgroundHeight;
     @Shadow int x;
     @Shadow int y;
@@ -112,7 +119,8 @@ public abstract class RecipeScreenMixin extends Screen implements RecipeScreenAc
         }
         backgroundHeight = Math.min(tallest, 46 + stations + Math.round(recipeHeight * jeict$zoom) + 6);
         y = (this.height - backgroundHeight) / 2 + 1;
-        return Math.round(current.getWidth() * jeict$zoom) + 16;
+        // The right padding grows with the zoom, so the enlarged buttons get a side panel of their own.
+        return Math.round(current.getWidth() * jeict$zoom) + 8 + Math.round(8 * jeict$zoom);
     }
 
     @ModifyArg(method = "setPage", at = @At(value = "INVOKE", target = "Ldev/emi/emi/screen/RecipeTab;constructWidgets(IIIII)Ljava/util/List;"), index = 3, require = 0)
@@ -121,7 +129,13 @@ public abstract class RecipeScreenMixin extends Screen implements RecipeScreenAc
     }
 
     @Inject(method = "setPage", at = @At("TAIL"), require = 0)
-    private void jeict$placeZoomed(int tabPage, int newTab, int newPage, CallbackInfo ci) {
+    private void jeict$afterSetPage(int tabPage, int newTab, int newPage, CallbackInfo ci) {
+        jeict$placeZoomed();
+        jeict$centerRecipeButtons();
+    }
+
+    @Unique
+    private void jeict$placeZoomed() {
         jeict$zoomed = null;
         if (jeict$zoom <= 1.0F || tabs.isEmpty()) {
             return;
@@ -138,11 +152,64 @@ public abstract class RecipeScreenMixin extends Screen implements RecipeScreenAc
         int availableHeight = backgroundHeight - 46 - (jeict$stationsBelow(current) ? 23 : 0);
         jeict$zoomed = group;
         jeict$left = x + 8 + (current.getWidth() - display.getWidth()) / 2.0F * z;
-        jeict$right = jeict$left + display.getWidth() * z;
+        // Up to the window's right edge, so the recentered recipe buttons stay clickable.
+        jeict$right = x + backgroundWidth;
         jeict$originX = jeict$left + display.getLeftWidth() * z;
         jeict$originY = y + 37 + Math.max(0.0F, (availableHeight - display.getHeight() * z) / 2.0F);
         jeict$top = jeict$originY - 4 * z;
         jeict$bottom = jeict$originY + (display.getHeight() + 4) * z;
+    }
+
+    /**
+     * EMI stacks a recipe's buttons from its bottom edge, just right of the recipe. On CelesTech pages each column is
+     * centered on the recipe's height, and the buttons right of the recipe are centered between the recipe and the
+     * window's right edge.
+     */
+    @Unique
+    private void jeict$centerRecipeButtons() {
+        if (tabs.isEmpty() || !Config.restyle() || !CelesTechTheme.isCelesTech(tabs.get(tab).category)) {
+            return;
+        }
+        for (WidgetGroup group : currentPage) {
+            if (group.recipe == null) {
+                continue;
+            }
+            Map<Integer, List<RecipeButtonWidgetAccessor>> columns = new TreeMap<>();
+            for (Widget widget : group.widgets) {
+                if (widget instanceof RecipeButtonWidget) {
+                    RecipeButtonWidgetAccessor button = (RecipeButtonWidgetAccessor) widget;
+                    columns.computeIfAbsent(button.jeict$x(), k -> new ArrayList<>()).add(button);
+                }
+            }
+            for (List<RecipeButtonWidgetAccessor> column : columns.values()) {
+                column.sort(Comparator.comparingInt(RecipeButtonWidgetAccessor::jeict$y));
+                int top = (group.height - (column.size() * 14 - 2)) / 2;
+                for (int i = 0; i < column.size(); i++) {
+                    column.get(i).jeict$setY(top + i * 14);
+                }
+            }
+            jeict$centerRightColumns(group, columns);
+        }
+    }
+
+    @Unique
+    private void jeict$centerRightColumns(WidgetGroup group, Map<Integer, List<RecipeButtonWidgetAccessor>> columns) {
+        List<Integer> right = columns.keySet().stream().filter(cx -> cx >= group.width).toList();
+        if (right.isEmpty()) {
+            return;
+        }
+        boolean zoomed = group == jeict$zoomed;
+        float zoom = zoomed ? jeict$zoom : 1.0F;
+        float origin = zoomed ? jeict$originX : group.x;
+        // Inner right edge of the window (its frame is 3 px thick), in the recipe's own coordinates.
+        float windowRight = (x + backgroundWidth - 3 - origin) / zoom;
+        int span = right.get(right.size() - 1) + 12 - right.get(0);
+        int shift = group.width + Math.round((windowRight - group.width - span) / 2.0F) - right.get(0);
+        for (int cx : right) {
+            for (RecipeButtonWidgetAccessor button : columns.get(cx)) {
+                button.jeict$setX(cx + shift);
+            }
+        }
     }
 
     @Unique
