@@ -1,0 +1,9 @@
+{
+  "jeict.configuration.title": "CelesTech EMI Fix",
+  "jeict.configuration.section.jeict.client.toml": "Вікно рецептів",
+  "jeict.configuration.section.jeict.client.toml.title": "CelesTech EMI Fix: вікно рецептів",
+  "jeict.configuration.restyleRecipeWindow": "Стиль CelesTech",
+  "jeict.configuration.restyleRecipeWindow.tooltip": "Малювати вікно рецептів EMI у стилі CelesTech, коли відкрита категорія CelesTech.",
+  "jeict.configuration.maxRecipeScale": "Найбільше збільшення",
+  "jeict.configuration.maxRecipeScale.tooltip": "Рецепти CelesTech збільшуються на весь вільний простір, але не більше ніж у стільки разів. 1.0 лишає звичайний розмір EMI."
+}

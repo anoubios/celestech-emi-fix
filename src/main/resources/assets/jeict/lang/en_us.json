@@ -1,0 +1,9 @@
+{
+  "jeict.configuration.title": "CelesTech EMI Fix",
+  "jeict.configuration.section.jeict.client.toml": "Recipe window",
+  "jeict.configuration.section.jeict.client.toml.title": "CelesTech EMI Fix: recipe window",
+  "jeict.configuration.restyleRecipeWindow": "CelesTech style",
+  "jeict.configuration.restyleRecipeWindow.tooltip": "Draw EMI's recipe window in CelesTech's style while a CelesTech category is open.",
+  "jeict.configuration.maxRecipeScale": "Largest zoom",
+  "jeict.configuration.maxRecipeScale.tooltip": "CelesTech recipes are enlarged to fill the free space, up to this factor. 1.0 keeps EMI's normal size."
+}

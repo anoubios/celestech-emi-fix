@@ -16,7 +16,9 @@ Temporary fix that shows CelesTech recipes in EMI.
 
 CelesTech 0.1.6-alpha ships an EMI plugin that only reports the size of its screens. EMI treats every mod with an EMI plugin as already supported, so it switches off CelesTech's JEI plugin and no CelesTech recipes show up.
 
-This addon hides that EMI plugin from EMI and registers its screen sizes itself, so EMI imports every CelesTech recipe category from the JEI plugin. It switches itself off when it is not needed (no EMI, no JEI, or a CelesTech version that fixed this). Remove it once CelesTech is fixed.
+This addon hides that EMI plugin from EMI and registers its screen sizes itself, so EMI imports every CelesTech recipe category from the JEI plugin. It switches itself off when it is not needed (no EMI, no JEI, or a CelesTech version that fixed this).
+
+It also enlarges CelesTech recipes to fill EMI's window, draws that window in CelesTech's style on CelesTech tabs, and moves tag tabs to the end. Both can be changed in the config.
 '''
 # Client-side only: servers do not need this mod and do not check its version.
 displayTest="IGNORE_ALL_VERSION"

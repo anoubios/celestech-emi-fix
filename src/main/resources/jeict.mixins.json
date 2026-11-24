@@ -5,7 +5,13 @@
   "plugin": "com.jeict.bridge.JeiCtMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "EmiAgnosMixin"
+    "EmiAgnosMixin",
+    "JemiSlotWidgetMixin",
+    "RecipeBackgroundMixin",
+    "RecipeButtonWidgetMixin",
+    "RecipeScreenMixin",
+    "SizedButtonWidgetMixin",
+    "SlotWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 0

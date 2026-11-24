@@ -1,0 +1,6 @@
+{
+  "minecraft:tag_recipes/item": { "order": 1000 },
+  "minecraft:tag_recipes/block": { "order": 1000 },
+  "minecraft:tag_recipes/fluid": { "order": 1000 },
+  "emi:tag": { "order": 1000 }
+}

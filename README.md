@@ -1,79 +1,69 @@
 # CelesTech EMI Fix
 
-An unofficial, temporary client-side mod that makes **CelesTech** recipes show up in **EMI** again.
+An unofficial, client-side mod that makes **CelesTech** recipes show up in **EMI** again, and makes them easy to read.
 
 - Minecraft 1.21.1, NeoForge
 - Made for CelesTech 0.1.6-alpha (mod version 0.503), EMI 1.1.24+1.21.1 and JEI 19.64.0.455
-- Not affiliated with CelesTech or its author. Remove it once CelesTech ships an official fix.
+- Not affiliated with CelesTech or its author
 
-> This mod was written with the help of an AI assistant (Claude). It is five small classes in
-> [`src/main/java`](src/main/java). Please read them before you trust the jar; it takes a few minutes.
+> This mod was written with the help of an AI assistant (Claude). All of it is in
+> [`src/main/java`](src/main/java); please read it before you trust the jar.
 
 ## Download
 
 Get `celestech-emi-fix-<version>.jar` from [Releases](https://github.com/anoubios/celestech-emi-fix/releases/latest)
-and put it in your `mods` folder next to CelesTech, JEI and EMI. It is needed on the client only.
+and put it in your `mods` folder next to CelesTech, JEI and EMI. It is needed on the client only. Keep only one
+version of it in the folder.
 
-## The problem
+## What it does
 
-With JEI and EMI installed together, none of CelesTech's own recipe categories appear: Fabricator, Foundry, Shipyard,
-the processing machines, implant table, condenser, cannon, supernova, multiblocks and gas processing. Only vanilla
-crafting and smelting recipes of CelesTech items are visible.
+- **Shows CelesTech recipes in EMI.** CelesTech's own JEI integration is switched off by EMI (see below); this mod
+  turns it back on, so all 15 CelesTech recipe categories appear in EMI.
+- **Enlarges CelesTech recipes.** On CelesTech tabs each recipe gets its own page and is zoomed to fill the window, so
+  its small text is readable. The zoom adapts to your screen and GUI scale and prefers sizes that keep CelesTech's
+  thin lines sharp. Clicks, hover, tooltips and R/U on enlarged slots work as usual.
+- **CelesTech style.** On CelesTech tabs the whole EMI recipe window (frame, tabs, title bars, arrows, recipe
+  buttons, workstation slot) is drawn in CelesTech's colors. Tabs from other mods keep EMI's normal look.
+- **Machine tab first.** The block, item and fluid tag tabs move to the end, so opening recipes for a machine shows
+  the machine's tab first.
+- **Tidy panels.** Machine animations that reach slightly past CelesTech's panel are kept inside it.
 
-## Why it happens
+Settings are in game under Mods > CelesTech EMI Fix > Config (or `config/jeict-client.toml`): the style can be turned
+off, and the largest zoom changed (1.0 keeps EMI's normal size).
 
-1. CelesTech ships a complete JEI plugin, `com.crist.celestech.integracion.PluginJei` (UID `celestech:jei`), with
-   15 recipe categories, catalysts, ore info pages and GUI handlers.
-2. It also ships an EMI plugin, `com.crist.celestech.integracion.PluginEmi`. That plugin only registers a screen-bounds
-   provider for CelesTech's custom screens (`PantallaFina`). It adds no categories or recipes.
-3. EMI treats every mod that has an EMI plugin as having native EMI support. EMI's mixin
-   `dev.emi.emi.mixin.jei.PluginCallerMixin` (into JEI's `mezz.jei.library.load.PluginCaller`) then drops every call to
-   a JEI plugin whose UID namespace belongs to such a mod, and JEMI skips that mod's JEI categories
-   ("Skipping recipe category ... because mod is already handled").
-4. So `PluginJei` never runs: JEI registers no `celestech:*` categories and EMI has nothing to import. In an affected
-   game, `config/jei/client/recipe-category-sort-order.ini` lists no `celestech:` category at all.
+The EMI fix switches itself off when it is not needed: without EMI or JEI, or once a CelesTech version fixes the issue.
+To check it, look in `logs/latest.log` for `[CelesTechEmiFix/]: Bridge active for CelesTech ...`; if it stays off,
+the log says why in a line starting with `Bridge inactive:`.
 
-With JEI alone, nothing skips `PluginJei`.
+## Why CelesTech recipes are missing in EMI
 
-## What this mod changes
+1. CelesTech ships a complete JEI plugin, `com.crist.celestech.integracion.PluginJei` (UID `celestech:jei`).
+2. It also ships an EMI plugin, `com.crist.celestech.integracion.PluginEmi`, which only reports the size of CelesTech's
+   custom screens. It adds no categories or recipes.
+3. EMI treats every mod with an EMI plugin as having native EMI support. Its mixin
+   `dev.emi.emi.mixin.jei.PluginCallerMixin` (into JEI's `PluginCaller`) then skips every JEI plugin of that mod, and
+   JEMI skips that mod's JEI categories.
+4. So `PluginJei` never runs and EMI has nothing to show. With JEI alone, nothing skips it.
 
-- It removes CelesTech's `PluginEmi` from the lists EMI gets from `dev.emi.emi.platform.EmiAgnos#getPlugins` and
-  `#getModsWithPlugins` (mixin [`EmiAgnosMixin`](src/main/java/com/jeict/mixin/EmiAgnosMixin.java)). EMI then lets
-  `PluginJei` run and imports every CelesTech category through JEMI.
-- It runs `PluginEmi` itself under this mod's id ([`JeiCtEmiPlugin`](src/main/java/com/jeict/emi/JeiCtEmiPlugin.java)),
-  so EMI still knows the size of CelesTech's screens.
-- It does nothing unless all of these hold ([`CelesTechBridge`](src/main/java/com/jeict/bridge/CelesTechBridge.java)):
-  EMI and JEI are installed, CelesTech's only EMI plugin is that screen-bounds class, CelesTech still has its JEI
-  plugin, and CelesTech registers no EMI recipes of its own. A CelesTech update that fixes the issue switches it off.
+This mod removes `PluginEmi` from the lists EMI gets from `dev.emi.emi.platform.EmiAgnos`, runs it under its own mod
+id instead (so EMI still knows CelesTech's screen sizes), and only does so while CelesTech's only EMI plugin is that
+screen-size class.
 
-It changes nothing else: no files, settings, network access or world data.
+## For the CelesTech developers
 
-To check that it works, look in `logs/latest.log` for:
+Either change fixes the missing recipes upstream:
 
-```
-[CelesTechEmiFix/]: Bridge active for CelesTech 0.503: ...
-[CelesTechEmiFix/]: Hid com.crist.celestech.integracion.PluginEmi from EMI; ...
-```
-
-If it decided to stay off, the log says why in a line starting with `Bridge inactive:`.
+1. Remove the `@EmiEntrypoint` `PluginEmi`. EMI then runs `PluginJei` through JEMI. The generic JEI GUI handler for
+   `PantallaFina` already returns `areaReal()` from `getGuiExtraAreas`, and JEMI passes JEI exclusion areas to EMI.
+2. Keep an EMI plugin, but register the recipes natively in EMI as well.
 
 ## Is the jar safe?
 
 - Release jars are built by GitHub Actions from the tagged source ([workflow](.github/workflows/release.yml)). Each
   release lists the jar's SHA-256 and links the build log.
-- The jar is about 10 KB: the five classes above, `META-INF/neoforge.mods.toml` and `jeict.mixins.json`.
-- Builds are reproducible: run `./gradlew build` with JDK 21 and compare
+- Builds are reproducible: run `./gradlew build` with JDK 21 and compare the SHA-256 of
   `build/libs/celestech-emi-fix-<version>.jar` with the release.
-
-## For the CelesTech developers
-
-Either change fixes this upstream:
-
-1. Remove the `@EmiEntrypoint` `PluginEmi`. EMI then runs `PluginJei` through JEMI. The screen area is mostly covered
-   already: the generic JEI GUI handler for `PantallaFina` returns `areaReal()` from `getGuiExtraAreas`, and JEMI passes
-   JEI exclusion areas on to EMI. JEMI 1.1.24 implements every JEI method `PluginJei`'s categories call.
-2. Keep an EMI plugin, but register the recipes natively in EMI as well. EMI will not call `PluginJei` while
-   `celestech` has an EMI entrypoint.
+- The mod changes nothing outside EMI's recipe screen: no files besides its own config, no network access, no world data.
 
 ## Building
 
