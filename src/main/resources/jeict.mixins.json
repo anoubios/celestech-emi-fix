@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.jeict.mixin",
+  "plugin": "com.jeict.bridge.JeiCtMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "EmiAgnosMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

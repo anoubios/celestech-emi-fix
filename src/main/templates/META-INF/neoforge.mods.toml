@@ -1,0 +1,60 @@
+# Mod metadata. Placeholders are filled in from gradle.properties at build time.
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/anoubios/celestech-emi-fix/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="https://github.com/anoubios/celestech-emi-fix"
+authors="anoubios"
+credits="Unofficial fix, not affiliated with CelesTech (made by crist). Written with the help of an AI assistant (Claude)."
+description='''
+Temporary fix that shows CelesTech recipes in EMI.
+
+CelesTech 0.1.6-alpha ships an EMI plugin that only reports the size of its screens. EMI treats every mod with an EMI plugin as already supported, so it switches off CelesTech's JEI plugin and no CelesTech recipes show up.
+
+This addon hides that EMI plugin from EMI and registers its screen sizes itself, so EMI imports every CelesTech recipe category from the JEI plugin. It switches itself off when it is not needed (no EMI, no JEI, or a CelesTech version that fixed this). Remove it once CelesTech is fixed.
+'''
+# Client-side only: servers do not need this mod and do not check its version.
+displayTest="IGNORE_ALL_VERSION"
+
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="celestech"
+    type="required"
+    versionRange="[0,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="emi"
+    type="optional"
+    versionRange="[0,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="jei"
+    type="optional"
+    versionRange="[0,)"
+    ordering="NONE"
+    side="CLIENT"
